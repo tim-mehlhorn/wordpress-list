@@ -1,0 +1,62 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="/bower_components/paper-card/paper-card.html">
+<link rel="import" href="/bower_components/paper-button/paper-button.html">
+<link rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html">
+
+<!--
+`wordpress-list`
+Load list of posts from a wordpress site that has the WP-REST API  plugin installed
+
+@demo demo/index.html 
+-->
+
+<dom-module id="wordpress-list">
+	<template>
+		<style>
+			:host {
+    			display:block;
+				max-width: 960px;
+				margin-left:auto;
+				margin-right:auto;
+			}
+
+			paper-card{margin: 0.5em;width:42%;max-width: 300px;}
+			paper-button{color:white;background-color: #1976D2;}
+			a{text-decoration:none;}
+		</style>
+		<iron-ajax
+		 	auto
+		 	url="{{url}}"
+		 	handle-as="json"
+		 	last-response="{{data}}"></iron-ajax>
+
+		 <template is="dom-repeat" items="[[data]]">
+		 	<paper-card heading="[[item.title.rendered]]" image="[[item.better_featured_image.media_details.sizes.medium.source_url]]" elevation="1" animated-shadow="false">
+		 	  <div class="card-actions">
+		 	    <a href="post/[[item.slug]]"><paper-button raised>Read More</paper-button></a>
+		 	  </div>
+		 	</paper-card>
+		 </template>
+
+	</template>
+	<script>
+		Polymer({
+			is: 'wordpress-list',
+			properties:{
+        /**Site is the url of the wordpress site */
+				site: {type:String, 
+          value : 'https://blog.timmehlhorn.com',
+           notify:true},
+        /**The final computed REST url to GET the list of wordpress posts */
+				url: {
+					computed: 'computeUrl(site)'
+				}
+			},
+			computeUrl: function(site){
+				return [site,'wp-json/wp/v2/posts'].join('/');
+			}
+		});
+		
+	</script>
+</dom-module>
